@@ -3,6 +3,7 @@ import TaskItem from './TaskItem';
 import AddTask from './AddTask';
 import axios from 'axios';
 import Spinner from '../Spinner';
+import swal from 'sweetalert';
 
 export default class Todo extends React.Component {
   state = {
@@ -42,7 +43,17 @@ export default class Todo extends React.Component {
   };
 
   addTask = task => {
-    this.setState({ tasks: [...this.state.tasks, task] });
+    const url = 'http://127.0.0.1:8000/api/todos';
+    const data = {
+      title: task.title,
+      description: task.title
+    };
+    axios.post(url, data).then(res => {
+      if (res.data.responseCode === '200') {
+        this.setState({ tasks: [...this.state.tasks, res.data.data] });
+        swal('Task Added!', 'You successfully added a task!', 'success');
+      }
+    });
   };
 
   getStyleForYourTasks = () => {
@@ -70,18 +81,16 @@ export default class Todo extends React.Component {
         )}
 
         <div className='bg-outline'>
-          {this.state.tasks
-            .map(task => {
-              return (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  deleteTask={this.deleteTask}
-                  toggleComplete={this.toggleComplete}
-                ></TaskItem>
-              );
-            })
-            .reverse()}
+          {this.state.tasks.map(task => {
+            return (
+              <TaskItem
+                key={task.id}
+                task={task}
+                deleteTask={this.deleteTask}
+                toggleComplete={this.toggleComplete}
+              ></TaskItem>
+            );
+          })}
         </div>
       </div>
     );
