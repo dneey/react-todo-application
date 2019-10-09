@@ -18,14 +18,21 @@ export default class Todo extends React.Component {
       .then(res => this.setState({ tasks: res.data.data, isLoading: 0 }));
   }
   deleteTask = taskId => {
-    const tasks = this.state.tasks.filter(task => {
-      if (task.id !== taskId) {
-        return task;
+    const url = 'http://127.0.0.1:8000/api/todos';
+    axios.delete(url + '/' + taskId).then(res => {
+      if (res.data.responseCode === '200') {
+        const tasks = this.state.tasks.filter(task => {
+          if (task.id !== taskId) {
+            return task;
+          }
+          console.log(task);
+          return null;
+        });
+        this.setState({ tasks });
+      } else {
+        swal('Try again!', 'Something went wrong!', 'error');
       }
-      console.log(task);
-      return null;
     });
-    this.setState({ tasks });
   };
 
   countTasks = () => {
